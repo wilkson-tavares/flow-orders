@@ -10,6 +10,8 @@ API REST em .NET 10 para gerenciamento de pedidos com cálculo de imposto e supo
 - [Arquitetura](#arquitetura)
 - [Pré-requisitos](#pré-requisitos)
 - [Como executar](#como-executar)
+- [Como executar o frontend](#como-executar-o-frontend)
+- [Executar tudo junto](#executar-tudo-junto)
 - [Como executar os testes](#como-executar-os-testes)
 - [Feature Flag — reforma tributária](#feature-flag--reforma-tributária)
 - [Endpoints](#endpoints)
@@ -41,13 +43,14 @@ FlowOrders.Orders.slnx
     └── FlowOrders.Orders.Tests      # Testes unitários e de integração
 ```
 
-**Regra de dependência:** `FlowOrders.Orders.Domain` não referencia nenhum projeto externo. `FlowOrders.Orders.Data` referencia apenas `FlowOrders.Orders.Domain`. `FlowOrders.Orders.API` referencia os três.
+**Regra de dependência:** `FlowOrders.Orders.Domain` não referencia nenhum projeto externo. `FlowOrders.Orders.Data` referencia apenas `FlowOrders.Orders.Domain`. `FlowOrders.Orders.API` referencia os dois.
 
 ---
 
 ## Pré-requisitos
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download) ou superior
+- [Node.js 20+](https://nodejs.org/) (para o frontend)
 
 Verifique a instalação:
 
@@ -78,9 +81,57 @@ dotnet restore
 dotnet run --project src/FlowOrders.Orders.API
 ```
 
-A API estará disponível em `http://localhost:5000`.
+A API estará disponível em `http://localhost:5088`.
 
-O Swagger estará disponível em `http://localhost:5000/swagger`.
+O Swagger estará disponível em `http://localhost:5088/swagger`.
+
+---
+
+## Como executar o frontend
+
+**1. Acesse a pasta do frontend:**
+
+```bash
+cd web
+```
+
+**2. Instale as dependências:**
+
+```bash
+npm install
+```
+
+**3. Inicie o servidor de desenvolvimento:**
+
+```bash
+npm run dev
+```
+
+O frontend estará disponível em `http://localhost:5173`.
+
+> O Vite está configurado com proxy: requisições para `/api` são redirecionadas automaticamente para `http://localhost:5088`, portanto a API precisa estar rodando.
+
+---
+
+## Executar tudo junto
+
+Abra dois terminais na raiz do repositório:
+
+**Terminal 1 — API:**
+
+```bash
+dotnet run --project src/FlowOrders.Orders.API
+```
+
+**Terminal 2 — Frontend:**
+
+```bash
+cd web
+npm install  # apenas na primeira vez
+npm run dev
+```
+
+Acesse `http://localhost:5173` no navegador.
 
 ---
 
@@ -146,7 +197,7 @@ FeatureFlags__UsingTaxReform=true dotnet run --project src/FlowOrders.Orders.API
 ### POST /api/orders — criar pedido
 
 ```bash
-curl -X POST http://localhost:5000/api/orders \
+curl -X POST http://localhost:5088/api/orders \
   -H "Content-Type: application/json" \
   -d '{
     "orderId": 1,
@@ -181,7 +232,7 @@ curl -X POST http://localhost:5000/api/orders \
 ### GET /api/orders/{id} — consultar pedido por ID
 
 ```bash
-curl http://localhost:5000/api/orders/1
+curl http://localhost:5088/api/orders/1
 ```
 
 **Resposta 200:**
@@ -190,7 +241,7 @@ curl http://localhost:5000/api/orders/1
   "id": 1,
   "orderId": 1,
   "clientId": 1,
-  "tax": 15.81,
+  "tax": 31.62,
   "status": "Created",
   "items": [
     {
@@ -214,7 +265,7 @@ curl http://localhost:5000/api/orders/1
 ### GET /api/orders?status={status} — listar por status
 
 ```bash
-curl http://localhost:5000/api/orders?status=Created
+curl http://localhost:5088/api/orders?status=Created
 ```
 
 Valores aceitos para `status`: `Created`, `Processing`, `Sent`.
@@ -226,7 +277,7 @@ Valores aceitos para `status`: `Created`, `Processing`, `Sent`.
     "id": 1,
     "orderId": 1,
     "clientId": 1,
-    "tax": 15.81,
+    "tax": 31.62,
     "status": "Created",
     "items": [...]
   }
@@ -238,7 +289,7 @@ Valores aceitos para `status`: `Created`, `Processing`, `Sent`.
 ### PATCH /api/orders/{id}/start-processing — iniciar processamento
 
 ```bash
-curl -X PATCH http://localhost:5000/api/orders/1/start-processing
+curl -X PATCH http://localhost:5088/api/orders/1/start-processing
 ```
 
 **Resposta 200:** ordem com `status: "Processing"`.
@@ -248,7 +299,7 @@ curl -X PATCH http://localhost:5000/api/orders/1/start-processing
 ### PATCH /api/orders/{id}/send — enviar para Sistema B
 
 ```bash
-curl -X PATCH http://localhost:5000/api/orders/1/send
+curl -X PATCH http://localhost:5088/api/orders/1/send
 ```
 
 **Resposta 200:** ordem com `status: "Sent"`.
