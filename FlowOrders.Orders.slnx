@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/FlowOrders.Orders.API/FlowOrders.Orders.API.csproj" />
+    <Project Path="src/FlowOrders.Orders.Data/FlowOrders.Orders.Data.csproj" />
+    <Project Path="src/FlowOrders.Orders.Domain/FlowOrders.Orders.Domain.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/FlowOrders.Orders.Tests/FlowOrders.Orders.Tests.csproj" />
+  </Folder>
+</Solution>
